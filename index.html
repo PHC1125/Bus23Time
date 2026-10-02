@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="zh-HK"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>城巴 23 到站時間</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0A1628"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Bus 23">
 <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#0A1628;--n7:#1a3259;--n6:#2c4a7c;--n5:#4164a5;--cyan:#06B6D4;--teal:#2DD4BF}
@@ -21,30 +22,70 @@ h1{font-size:48px;font-weight:700;margin:12px 0 8px;background:linear-gradient(t
 .clock{background:#111c35;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .clock .t{font-size:36px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums}.clock .d{color:rgba(255,255,255,.75)}
 .btn{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:12px 20px;border-radius:8px;background:var(--cyan);color:#0A1628;font-weight:700;text-decoration:none}.btn:hover{background:var(--teal)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lang{display:flex;border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden}.lang button{background:none;border:0;color:rgba(255,255,255,.7);padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}.lang button.on{background:var(--cyan);color:#0A1628;font-weight:700}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.btns .btn{margin-top:0}.btn2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer;font:inherit;font-weight:700}.btn2:hover{background:rgba(255,255,255,.08)}.btn2.on{border-color:var(--teal);color:var(--teal)}
+.alert{display:none;margin-top:16px}.alert.show{display:block}.alert .dist{font-size:30px;font-weight:700;color:var(--teal)}.alert.near{border-color:var(--teal);background:rgba(45,212,191,.12);animation:p 1s infinite}
+.hint{font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5}
 .foot{margin-top:24px;font-size:12px;color:rgba(255,255,255,.5)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:6px;animation:p 2s infinite}
 @keyframes p{50%{opacity:.3}}
 </style></head><body><div class="wrap">
 <div class="clock"><div class="t" id="ct">--:--:--</div><div class="d" id="cd"></div></div>
-<span class="badge">城巴 CITYBUS · 23</span>
-<h1>23 往 蒲飛路</h1>
-<p class="sub">北角碼頭 → 蒲飛路 · North Point Ferry Pier → Pokfield Road</p>
+<div class="top"><span class="badge">城巴 CITYBUS · 23</span><div class="lang"><button data-l="zh">中文</button><button data-l="both">中 / EN</button><button data-l="en">EN</button></div></div>
+<h1 data-zh="23 往 蒲飛路" data-en="23 to Pokfield Road"></h1>
+<p class="sub" data-zh="北角碼頭 → 蒲飛路" data-en="North Point Ferry Pier → Pokfield Road"></p>
 <div class="grid">
- <div class="card"><h2>琴行街, 英皇道</h2><div class="en">Kam Hong Street, King's Road</div><div id="s001279">載入中…</div></div>
- <div class="card"><h2>孫中山紀念館, 堅道</h2><div class="en">Dr Sun Yat-sen Museum, Caine Road</div><div id="s001019">載入中…</div></div>
+ <div class="card"><h2 data-zh="琴行街, 英皇道" data-en="Kam Hong Street, King's Road"></h2><div class="en" data-sub-en="Kam Hong Street, King's Road"></div><div id="s001279">載入中…</div></div>
+ <div class="card"><h2 data-zh="孫中山紀念館, 堅道" data-en="Dr Sun Yat-sen Museum, Caine Road"></h2><div class="en" data-sub-en="Dr Sun Yat-sen Museum, Caine Road"></div><div id="s001019">載入中…</div></div>
 </div>
-<a class="btn" href="https://maps.app.goo.gl/8rwvKbJxrAzRKPmRA" target="_blank" rel="noopener">追蹤我的位置 Track my location</a>
-<div class="foot"><span class="dot"></span><span id="upd">每 30 秒自動更新</span> · 資料來源：城巴 / DATA.GOV.HK</div>
+<div class="btns"><a class="btn" href="https://maps.app.goo.gl/8rwvKbJxrAzRKPmRA" target="_blank" rel="noopener" data-zh="追蹤我的位置" data-en="Track my location"></a>
+<button class="btn btn2" id="gbtn" data-zh="開啟落車提示" data-en="Start get-off alert"></button>
+<button class="btn btn2" id="ibtn" style="display:none" data-zh="加到主畫面" data-en="Add to home screen"></button></div>
+<div class="card alert" id="alert"><div class="en" data-zh="距離 香港大學東閘, 般咸道" data-en="Distance to HKU East Gate, Bonham Road"></div><div class="dist" id="dist">--</div><div class="hint" id="gmsg"></div></div>
+<div class="hint" id="ihint"></div>
+<div class="foot"><span class="dot"></span><span id="upd"></span> · <span data-zh="資料來源：城巴 / DATA.GOV.HK" data-en="Data: Citybus / DATA.GOV.HK"></span></div>
 </div>
 <script>
+let LANG=localStorage.getItem('lang')||'both';
+const T={zh:{loading:"載入中…",err:"未能取得資料",none:"暫時沒有班次資料",arr:"即將到達",min:"分鐘",upd:"最後更新",auto:"每 30 秒自動更新",start:"開啟落車提示",stop:"停止落車提示",near:"快到站，準備落車",away:"米",locating:"正在取得位置…",denied:"無法取得位置，請允許定位權限",keep:"請保持此頁面開啟，到站前約 300 米會震動及響鬧"},
+en:{loading:"Loading…",err:"Could not load data",none:"No departures right now",arr:"Arriving",min:"min",upd:"Updated",auto:"refreshes every 30 s",start:"Start get-off alert",stop:"Stop get-off alert",near:"Almost there, get ready to get off",away:"m",locating:"Getting your location…",denied:"Location unavailable. Please allow location access",keep:"Keep this page open. It will vibrate and beep about 300 m before the stop"}};
+const L=k=>LANG==='en'?T.en[k]:LANG==='zh'?T.zh[k]:T.zh[k]+" / "+T.en[k];
+const L1=k=>LANG==='en'?T.en[k]:T.zh[k];
+function applyLang(){document.querySelectorAll('[data-zh]').forEach(e=>{e.textContent=LANG==='en'?e.dataset.en:LANG==='zh'?e.dataset.zh:(e.tagName==='H2'||e.classList.contains('btn')?e.dataset.zh:e.dataset.zh+" · "+e.dataset.en)});
+document.querySelectorAll('[data-sub-en]').forEach(e=>{e.textContent=LANG==='both'?e.dataset.subEn:"";e.style.display=LANG==='both'?'':'none'});
+document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
+document.documentElement.lang=LANG==='en'?'en':'zh-HK';gbtn.textContent=L1(watch!==null?'stop':'start');if(lastUpd)setUpd();render();tick();if(lastPos)showDist()}
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;localStorage.setItem('lang',LANG);applyLang()});
+let lastUpd=null;function setUpd(){upd.textContent=L1('upd')+" "+lastUpd.toLocaleTimeString('zh-HK',{hour12:false})+" · "+L1('auto')}
 const STOPS=["001279","001019"],data={};
 async function load(){await Promise.all(STOPS.map(async s=>{try{const j=await(await fetch(`https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${s}/23`)).json();data[s]=j.data.filter(d=>d.dir==="O"&&d.eta)}catch(e){data[s]=null}}));
-document.getElementById('upd').textContent="最後更新 "+new Date().toLocaleTimeString('zh-HK',{hour12:false})+" · 每 30 秒自動更新";render()}
+lastUpd=new Date();setUpd();render()}
 function render(){const now=Date.now();STOPS.forEach(s=>{const el=document.getElementById('s'+s),a=data[s];
-if(a===undefined)return;if(a===null){el.textContent="未能取得資料";return}if(!a.length){el.textContent="暫時沒有班次資料";return}
+if(a===undefined)return;if(a===null){el.textContent=L1("err");return}if(!a.length){el.textContent=L1("none");return}
 el.innerHTML=a.map(d=>{const t=new Date(d.eta),m=Math.max(0,Math.round((t-now)/60000));
-return`<div class="row"><div><div class="min">${m===0?"即將到達":m+"<small>分鐘</small>"}</div>${d.rmk_tc?`<div class="rmk">${d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false})}</div></div>`}).join("")})}
-function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false});cd.textContent=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long"})+" · "+n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+return`<div class="row"><div><div class="min">${m===0?L1("arr"):m+"<small>"+L1("min")+"</small>"}</div>${(LANG==="en"?d.rmk_en:d.rmk_tc)?`<div class="rmk">${LANG==="en"?d.rmk_en:d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false})}</div></div>`}).join("")})}
+function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false});const z=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long"}),e=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});cd.textContent=LANG==="en"?e:LANG==="zh"?z:z+" · "+e}
 tick();setInterval(tick,1000);
+// Get-off alert: HKU East Gate, Bonham Road (Citybus stop 001012)
+const DEST={lat:22.283960482091,lng:114.13870250053},NEAR=300;let watch=null,lastPos=null,alerted=false,wake=null;
+function hav(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.4,c.currentTime+t);o.start(c.currentTime+t);o.stop(c.currentTime+t+.25)})}catch(e){}}
+function showDist(){const m=hav(lastPos.latitude,lastPos.longitude,DEST.lat,DEST.lng);dist.textContent=m>=1000?(m/1000).toFixed(2)+" km":Math.round(m)+" "+L1('away');
+const near=m<=NEAR;alert.classList.toggle('near',near);gmsg.textContent=near?L1('near'):L1('keep');
+if(near&&!alerted){alerted=true;navigator.vibrate&&navigator.vibrate([400,200,400,200,800]);beep();if(window.Notification&&Notification.permission==="granted")new Notification("Bus 23",{body:L1('near'),icon:"icon-192.png"})}
+if(m>NEAR*2)alerted=false}
+async function startG(){if(!navigator.geolocation){gmsg.textContent=L1('denied');return}alert.classList.add('show');gmsg.textContent=L1('locating');alerted=false;
+if(window.Notification&&Notification.permission==="default")Notification.requestPermission();try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
+watch=navigator.geolocation.watchPosition(p=>{lastPos=p.coords;showDist()},()=>{gmsg.textContent=L1('denied')},{enableHighAccuracy:true,maximumAge:5000});gbtn.classList.add('on');gbtn.textContent=L1('stop')}
+function stopG(){navigator.geolocation.clearWatch(watch);watch=null;wake&&wake.release();wake=null;alert.classList.remove('show','near');gbtn.classList.remove('on');gbtn.textContent=L1('start')}
+gbtn.onclick=()=>watch===null?startG():stopG();
+// Home screen app
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+let dp=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;ibtn.style.display=''});
+ibtn.onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;ibtn.style.display='none'}};
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+if(ios&&!standalone){ibtn.style.display='';ibtn.onclick=()=>{ihint.textContent=LANG==='en'?'In Safari, tap Share, then "Add to Home Screen".':'在 Safari 按「分享」，再選「加入主畫面」。'}}
+applyLang();
 load();setInterval(load,30000);setInterval(render,10000);
 </script></body></html>
