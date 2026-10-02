@@ -57,15 +57,15 @@ document.querySelectorAll('[data-sub-en]').forEach(e=>{e.textContent=LANG==='bot
 document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
 document.documentElement.lang=LANG==='en'?'en':'zh-HK';gbtn.textContent=L1(watch!==null?'stop':'start');if(lastUpd)setUpd();render();tick();if(lastPos)showDist()}
 document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;localStorage.setItem('lang',LANG);applyLang()});
-let lastUpd=null;function setUpd(){upd.textContent=L1('upd')+" "+lastUpd.toLocaleTimeString('zh-HK',{hour12:false})+" · "+L1('auto')}
+let lastUpd=null;function setUpd(){upd.textContent=L1('upd')+" "+lastUpd.toLocaleTimeString('zh-HK',{hour12:false,timeZone:"Asia/Hong_Kong"})+" · "+L1('auto')}
 const STOPS=["001279","001019"],data={};
 async function load(){await Promise.all(STOPS.map(async s=>{try{const j=await(await fetch(`https://rt.data.gov.hk/v2/transport/citybus/eta/CTB/${s}/23`)).json();data[s]=j.data.filter(d=>d.dir==="O"&&d.eta)}catch(e){data[s]=null}}));
 lastUpd=new Date();setUpd();render()}
 function render(){const now=Date.now();STOPS.forEach(s=>{const el=document.getElementById('s'+s),a=data[s];
 if(a===undefined)return;if(a===null){el.textContent=L1("err");return}if(!a.length){el.textContent=L1("none");return}
 el.innerHTML=a.map(d=>{const t=new Date(d.eta),m=Math.max(0,Math.round((t-now)/60000));
-return`<div class="row"><div><div class="min">${m===0?L1("arr"):m+"<small>"+L1("min")+"</small>"}</div>${(LANG==="en"?d.rmk_en:d.rmk_tc)?`<div class="rmk">${LANG==="en"?d.rmk_en:d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false})}</div></div>`}).join("")})}
-function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false});const z=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long"}),e=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});cd.textContent=LANG==="en"?e:LANG==="zh"?z:z+" · "+e}
+return`<div class="row"><div><div class="min">${m===0?L1("arr"):m+"<small>"+L1("min")+"</small>"}</div>${(LANG==="en"?d.rmk_en:d.rmk_tc)?`<div class="rmk">${LANG==="en"?d.rmk_en:d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:"Asia/Hong_Kong"})}</div></div>`}).join("")})}
+function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false,timeZone:"Asia/Hong_Kong"});const z=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long",timeZone:"Asia/Hong_Kong"}),e=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});cd.textContent=LANG==="en"?e:LANG==="zh"?z:z+" · "+e}
 tick();setInterval(tick,1000);
 // Get-off alert: HKU East Gate, Bonham Road (Citybus stop 001012)
 const DEST={lat:22.283960482091,lng:114.13870250053},NEAR=300;let watch=null,lastPos=null,alerted=false,wake=null;
