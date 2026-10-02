@@ -18,10 +18,14 @@ h1{font-size:48px;font-weight:700;margin:12px 0 8px;background:linear-gradient(t
 .min{font-size:30px;font-weight:700;color:var(--teal)}.min small{font-size:14px;color:rgba(255,255,255,.6);margin-left:4px}
 .time{font-size:14px;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums}
 .rmk{font-size:12px;color:var(--cyan)}
+.clock{background:#111c35;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 24px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.clock .t{font-size:36px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums}.clock .d{color:rgba(255,255,255,.75)}
+.btn{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:12px 20px;border-radius:8px;background:var(--cyan);color:#0A1628;font-weight:700;text-decoration:none}.btn:hover{background:var(--teal)}
 .foot{margin-top:24px;font-size:12px;color:rgba(255,255,255,.5)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:6px;animation:p 2s infinite}
 @keyframes p{50%{opacity:.3}}
 </style></head><body><div class="wrap">
+<div class="clock"><div class="t" id="ct">--:--:--</div><div class="d" id="cd"></div></div>
 <span class="badge">城巴 CITYBUS · 23</span>
 <h1>23 往 蒲飛路</h1>
 <p class="sub">北角碼頭 → 蒲飛路 · North Point Ferry Pier → Pokfield Road</p>
@@ -29,6 +33,7 @@ h1{font-size:48px;font-weight:700;margin:12px 0 8px;background:linear-gradient(t
  <div class="card"><h2>琴行街, 英皇道</h2><div class="en">Kam Hong Street, King's Road</div><div id="s001279">載入中…</div></div>
  <div class="card"><h2>孫中山紀念館, 堅道</h2><div class="en">Dr Sun Yat-sen Museum, Caine Road</div><div id="s001019">載入中…</div></div>
 </div>
+<a class="btn" href="https://maps.app.goo.gl/8rwvKbJxrAzRKPmRA" target="_blank" rel="noopener">📍 追蹤我的位置 Track my location</a>
 <div class="foot"><span class="dot"></span><span id="upd">每 30 秒自動更新</span> · 資料來源：城巴 / DATA.GOV.HK</div>
 </div>
 <script>
@@ -39,5 +44,7 @@ function render(){const now=Date.now();STOPS.forEach(s=>{const el=document.getEl
 if(a===undefined)return;if(a===null){el.textContent="未能取得資料";return}if(!a.length){el.textContent="暫時沒有班次資料";return}
 el.innerHTML=a.map(d=>{const t=new Date(d.eta),m=Math.max(0,Math.round((t-now)/60000));
 return`<div class="row"><div><div class="min">${m===0?"即將到達":m+"<small>分鐘</small>"}</div>${d.rmk_tc?`<div class="rmk">${d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false})}</div></div>`}).join("")})}
+function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false});cd.textContent=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long"})+" · "+n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}
+tick();setInterval(tick,1000);
 load();setInterval(load,30000);setInterval(render,10000);
 </script></body></html>
