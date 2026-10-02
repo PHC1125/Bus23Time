@@ -25,7 +25,6 @@ h1{font-size:48px;font-weight:700;margin:12px 0 8px;background:linear-gradient(t
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .lang{display:flex;border:1px solid rgba(255,255,255,.15);border-radius:8px;overflow:hidden}.lang button{background:none;border:0;color:rgba(255,255,255,.7);padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}.lang button.on{background:var(--cyan);color:#0A1628;font-weight:700}
 .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.btns .btn{margin-top:0}.btn2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.2);cursor:pointer;font:inherit;font-weight:700}.btn2:hover{background:rgba(255,255,255,.08)}.btn2.on{border-color:var(--teal);color:var(--teal)}
-.alert{display:none;margin-top:16px}.alert.show{display:block}.alert .dist{font-size:30px;font-weight:700;color:var(--teal)}.alert.near{border-color:var(--teal);background:rgba(45,212,191,.12);animation:p 1s infinite}
 .hint{font-size:12px;color:rgba(255,255,255,.5);margin-top:6px;line-height:1.5}
 .foot{margin-top:24px;font-size:12px;color:rgba(255,255,255,.5)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:6px;animation:p 2s infinite}
@@ -40,9 +39,7 @@ h1{font-size:48px;font-weight:700;margin:12px 0 8px;background:linear-gradient(t
  <div class="card"><h2 data-zh="孫中山紀念館, 堅道" data-en="Dr Sun Yat-sen Museum, Caine Road"></h2><div class="en" data-sub-en="Dr Sun Yat-sen Museum, Caine Road"></div><div id="s001019">載入中…</div></div>
 </div>
 <div class="btns"><a class="btn" href="https://maps.app.goo.gl/8rwvKbJxrAzRKPmRA" target="_blank" rel="noopener" data-zh="追蹤我的位置" data-en="Track my location"></a>
-<button class="btn btn2" id="gbtn" data-zh="開啟落車提示" data-en="Start get-off alert"></button>
 <button class="btn btn2" id="ibtn" style="display:none" data-zh="加到主畫面" data-en="Add to home screen"></button></div>
-<div class="card alert" id="alert"><div class="en" data-zh="距離 香港大學東閘, 般咸道" data-en="Distance to HKU East Gate, Bonham Road"></div><div class="dist" id="dist">--</div><div class="hint" id="gmsg"></div></div>
 <div class="hint" id="ihint"></div>
 <div class="foot"><span class="dot"></span><span id="upd"></span> · <span data-zh="資料來源：城巴 / DATA.GOV.HK" data-en="Data: Citybus / DATA.GOV.HK"></span></div>
 </div>
@@ -55,7 +52,7 @@ const L1=k=>LANG==='en'?T.en[k]:T.zh[k];
 function applyLang(){document.querySelectorAll('[data-zh]').forEach(e=>{e.textContent=LANG==='en'?e.dataset.en:LANG==='zh'?e.dataset.zh:(e.tagName==='H2'||e.classList.contains('btn')?e.dataset.zh:e.dataset.zh+" · "+e.dataset.en)});
 document.querySelectorAll('[data-sub-en]').forEach(e=>{e.textContent=LANG==='both'?e.dataset.subEn:"";e.style.display=LANG==='both'?'':'none'});
 document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));
-document.documentElement.lang=LANG==='en'?'en':'zh-HK';gbtn.textContent=L1(watch!==null?'stop':'start');if(lastUpd)setUpd();render();tick();if(lastPos)showDist()}
+document.documentElement.lang=LANG==='en'?'en':'zh-HK';if(lastUpd)setUpd();render();tick()}
 document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;localStorage.setItem('lang',LANG);applyLang()});
 let lastUpd=null;function setUpd(){upd.textContent=L1('upd')+" "+lastUpd.toLocaleTimeString('zh-HK',{hour12:false,timeZone:"Asia/Hong_Kong"})+" · "+L1('auto')}
 const STOPS=["001279","001019"],data={};
@@ -67,19 +64,6 @@ el.innerHTML=a.map(d=>{const t=new Date(d.eta),m=Math.max(0,Math.round((t-now)/6
 return`<div class="row"><div><div class="min">${m===0?L1("arr"):m+"<small>"+L1("min")+"</small>"}</div>${(LANG==="en"?d.rmk_en:d.rmk_tc)?`<div class="rmk">${LANG==="en"?d.rmk_en:d.rmk_tc}</div>`:""}</div><div class="time">${t.toLocaleTimeString('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:"Asia/Hong_Kong"})}</div></div>`}).join("")})}
 function tick(){const n=new Date();ct.textContent=n.toLocaleTimeString("zh-HK",{hour12:false,timeZone:"Asia/Hong_Kong"});const z=n.toLocaleDateString("zh-HK",{year:"numeric",month:"long",day:"numeric",weekday:"long",timeZone:"Asia/Hong_Kong"}),e=n.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});cd.textContent=LANG==="en"?e:LANG==="zh"?z:z+" · "+e}
 tick();setInterval(tick,1000);
-// Get-off alert: HKU East Gate, Bonham Road (Citybus stop 001012)
-const DEST={lat:22.283960482091,lng:114.13870250053},NEAR=300;let watch=null,lastPos=null,alerted=false,wake=null;
-function hav(a,b,c,d){const R=6371000,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b),h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
-function beep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(t=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.4,c.currentTime+t);o.start(c.currentTime+t);o.stop(c.currentTime+t+.25)})}catch(e){}}
-function showDist(){const m=hav(lastPos.latitude,lastPos.longitude,DEST.lat,DEST.lng);dist.textContent=m>=1000?(m/1000).toFixed(2)+" km":Math.round(m)+" "+L1('away');
-const near=m<=NEAR;alert.classList.toggle('near',near);gmsg.textContent=near?L1('near'):L1('keep');
-if(near&&!alerted){alerted=true;navigator.vibrate&&navigator.vibrate([400,200,400,200,800]);beep();if(window.Notification&&Notification.permission==="granted")new Notification("Bus 23",{body:L1('near'),icon:"icon-192.png"})}
-if(m>NEAR*2)alerted=false}
-async function startG(){if(!navigator.geolocation){gmsg.textContent=L1('denied');return}alert.classList.add('show');gmsg.textContent=L1('locating');alerted=false;
-if(window.Notification&&Notification.permission==="default")Notification.requestPermission();try{wake=await navigator.wakeLock?.request('screen')}catch(e){}
-watch=navigator.geolocation.watchPosition(p=>{lastPos=p.coords;showDist()},()=>{gmsg.textContent=L1('denied')},{enableHighAccuracy:true,maximumAge:5000});gbtn.classList.add('on');gbtn.textContent=L1('stop')}
-function stopG(){navigator.geolocation.clearWatch(watch);watch=null;wake&&wake.release();wake=null;alert.classList.remove('show','near');gbtn.classList.remove('on');gbtn.textContent=L1('start')}
-gbtn.onclick=()=>watch===null?startG():stopG();
 // Home screen app
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 let dp=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;ibtn.style.display=''});
